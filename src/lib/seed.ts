@@ -119,8 +119,33 @@ const initialProjects = [
   }
 ];
 
+const initialPackages = [
+  {
+    title: "Sesi Personal",
+    description: "Sesi potret individu dengan fokus pada karakter dan kepribadian serta pencahayaan alami yang indah.",
+    price: "Rp 1.500.000",
+    features: ["2 Jam Sesi", "15 Foto Edit", "Semua File Mentah", "1 Lokasi"],
+    order: 0
+  },
+  {
+    title: "Wedding Cinematic",
+    description: "Dokumentasi lengkap hari bahagia Anda dengan gaya sinematik yang abadi dan penuh emosi.",
+    price: "Rp 7.500.000",
+    features: ["8 Jam Liputan", "Wedding Film (3-5 menit)", "Teaser Instagram", "2 Videografer"],
+    order: 1
+  },
+  {
+    title: "Editorial Fashion",
+    description: "Produksi visual tingkat tinggi untuk kebutuhan brand dan fashion dengan standar industri.",
+    price: "Rp 3.000.000",
+    features: ["Sesi Studio/Outdoor", "10 Foto Retouch Pro", "Moodboard", "Creative Direction"],
+    order: 2
+  }
+];
+
 export async function seedDatabase() {
   try {
+    // Seed Projects
     const { data: existingProjects, error: fetchError } = await supabase
       .from('projects')
       .select('id')
@@ -129,13 +154,31 @@ export async function seedDatabase() {
     if (fetchError) throw fetchError;
 
     if (!existingProjects || existingProjects.length === 0) {
-      console.log('Mengisi pangkalan data...');
+      console.log('Mengisi data proyek...');
       const { error: seedError } = await supabase
         .from('projects')
         .insert(initialProjects);
 
       if (seedError) throw seedError;
-      console.log('Pangkalan data berhasil diisi!');
+      console.log('Data proyek berhasil diisi!');
+    }
+
+    // Seed Packages
+    const { data: existingPackages, error: packageFetchError } = await supabase
+      .from('packages')
+      .select('id')
+      .limit(1);
+
+    if (packageFetchError) throw packageFetchError;
+
+    if (!existingPackages || existingPackages.length === 0) {
+      console.log('Mengisi data paket...');
+      const { error: packageSeedError } = await supabase
+        .from('packages')
+        .insert(initialPackages);
+
+      if (packageSeedError) throw packageSeedError;
+      console.log('Data paket berhasil diisi!');
     }
   } catch (error) {
     console.error('Terjadi kesalahan saat mengisi pangkalan data:', error);

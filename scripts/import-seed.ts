@@ -119,31 +119,67 @@ const initialProjects = [
   }
 ];
 
+const initialPackages = [
+  {
+    title: "Sesi Personal",
+    description: "Sesi potret individu dengan fokus pada karakter dan kepribadian serta pencahayaan alami yang indah.",
+    price: "Rp 1.500.000",
+    features: ["2 Jam Sesi", "15 Foto Edit", "Semua File Mentah", "1 Lokasi"],
+    order: 0
+  },
+  {
+    title: "Wedding Cinematic",
+    description: "Dokumentasi lengkap hari bahagia Anda dengan gaya sinematik yang abadi dan penuh emosi.",
+    price: "Rp 7.500.000",
+    features: ["8 Jam Liputan", "Wedding Film (3-5 menit)", "Teaser Instagram", "2 Videografer"],
+    order: 1
+  },
+  {
+    title: "Editorial Fashion",
+    description: "Produksi visual tingkat tinggi untuk kebutuhan brand dan fashion dengan standar industri.",
+    price: "Rp 3.000.000",
+    features: ["Sesi Studio/Outdoor", "10 Foto Retouch Pro", "Moodboard", "Creative Direction"],
+    order: 2
+  }
+];
+
 async function forceSeed() {
-  console.log('Menghapus pangkalan data lama...');
+  console.log('Menghapus data lama (Proyek)...');
   const { error: deleteError } = await supabase
     .from('projects')
     .delete()
-    .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+    .neq('id', '00000000-0000-0000-0000-000000000000');
 
   if (deleteError) {
-    console.error('Gagal menghapus data:', deleteError.message);
-    return;
+    console.error('Gagal menghapus data proyek:', deleteError.message);
+  } else {
+    console.log('Mengisi data proyek baru...');
+    const { error: seedError } = await supabase
+      .from('projects')
+      .insert(initialProjects);
+    if (seedError) console.error('Gagal mengisi data proyek:', seedError.message);
+    else console.log('Data proyek berhasil diperbarui!');
   }
 
-  console.log('Mengisi pangkalan data baru...');
-  const { error: seedError } = await supabase
-    .from('projects')
-    .insert(initialProjects);
+  console.log('\nMenghapus data lama (Paket)...');
+  const { error: pkgDeleteError } = await supabase
+    .from('packages')
+    .delete()
+    .neq('id', '00000000-0000-0000-0000-000000000000');
 
-  if (seedError) {
-    console.error('Gagal mengisi data baru:', seedError.message);
-    if (seedError.message.includes('column "video_url" of relation "projects" does not exist')) {
-      console.warn('\n>>> PENTING: Kolom "video_url" tidak ditemukan di tabel "projects".');
-      console.warn('>>> Harap tambahkan kolom tersebut di dashboard Supabase (Tipe: Text, Nullable).');
+  if (pkgDeleteError) {
+    console.error('Gagal menghapus data paket:', pkgDeleteError.message);
+    if (pkgDeleteError.message.includes('relation "public.packages" does not exist')) {
+        console.error('>>> TABEL "packages" BELUM DIBUAT. Harap jalankan SQL di Supabase terlebih dahulu.');
+        return;
     }
   } else {
-    console.log('Pangkalan data berhasil diperbarui dengan video portofolio!');
+    console.log('Mengisi data paket baru...');
+    const { error: pkgSeedError } = await supabase
+      .from('packages')
+      .insert(initialPackages);
+    if (pkgSeedError) console.error('Gagal mengisi data paket:', pkgSeedError.message);
+    else console.log('Data paket berhasil diperbarui!');
   }
 }
 

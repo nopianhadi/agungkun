@@ -20,6 +20,8 @@ import { ServicesPage } from './pages/ServicesPage';
 import { GalleryPage } from './pages/GalleryPage';
 import { JournalPage } from './pages/JournalPage';
 import { ContactPage } from './pages/ContactPage';
+import { PackagesPage } from './pages/PackagesPage';
+import { BookingPage } from './pages/BookingPage';
 import { ProjectDetail } from './pages/ProjectDetail';
 
 export default function App() {
@@ -78,6 +80,8 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/tentang" element={<AboutPage />} />
             <Route path="/layanan" element={<ServicesPage />} />
+            <Route path="/paket" element={<PackagesPage />} />
+            <Route path="/booking" element={<BookingPage />} />
             <Route path="/galeri" element={<GalleryPage />} />
             <Route path="/jurnal" element={<JournalPage />} />
             <Route path="/kontak" element={<ContactPage />} />

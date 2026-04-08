@@ -7,11 +7,11 @@ export const MenuOverlay = ({ isOpen, onClose }: { isOpen: boolean, onClose: () 
   const location = useLocation();
   
   const menuItems = [
-    { name: 'Home', path: '/' },
-    { name: 'Jurnal', path: '/jurnal' },
+    { name: 'Beranda', path: '/' },
     { name: 'Tentang', path: '/tentang' },
-    { name: 'Layanan', path: '/layanan' },
+    { name: 'Paket', path: '/paket' },
     { name: 'Galeri', path: '/galeri' },
+    { name: 'Jurnal', path: '/jurnal' },
     { name: 'Kontak', path: '/kontak' }
   ];
 

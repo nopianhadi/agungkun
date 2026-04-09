@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Check, ArrowRight, Camera, Sparkles, Heart, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FadeIn } from '../components/UI/FadeIn';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface Package {
   id: string;
@@ -18,6 +19,7 @@ export const PackagesPage = () => {
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const { scrollY } = useScroll();
+  const { getContent } = useSiteContent();
 
   // Parallax transforms
   const heroY = useTransform(scrollY, [0, 500], [0, 200]);
@@ -55,7 +57,7 @@ export const PackagesPage = () => {
       <section className="relative h-[80vh] w-full overflow-hidden bg-[#1F2021]">
         <motion.div style={{ y: heroY }} className="absolute inset-0 w-full h-[120%]">
           <img
-            src="https://images.unsplash.com/photo-1510076857177-7470076d4098?q=80&w=2000&auto=format&fit=crop"
+            src={getContent('pkgs_hero_image', 'https://images.unsplash.com/photo-1510076857177-7470076d4098?q=80&w=2000&auto=format&fit=crop')}
             alt="Hero Background"
             className="w-full h-full object-cover grayscale opacity-60"
           />
@@ -68,13 +70,13 @@ export const PackagesPage = () => {
         >
           <FadeIn direction="up">
             <span className="text-[10px] uppercase tracking-[0.4em] mb-8 block font-medium opacity-60">
-              Investasi Masa Depan
+              {getContent('pkgs_hero_badge', 'Investasi Masa Depan')}
             </span>
             <h1 className="text-6xl md:text-[10vw] font-medium tracking-tighter leading-[0.8] mb-8">
-              Momen Abadi.
+              {getContent('pkgs_hero_title', 'Momen Abadi.')}
             </h1>
             <p className="text-sm md:text-xl font-light tracking-wide max-w-xl mx-auto opacity-80 leading-relaxed">
-              Sebuah investasi untuk kenangan yang tidak akan pernah pudar oleh waktu.
+              {getContent('pkgs_hero_desc', 'Sebuah investasi untuk kenangan yang tidak akan pernah pudar oleh waktu.')}
             </p>
           </FadeIn>
         </motion.div>
@@ -86,7 +88,7 @@ export const PackagesPage = () => {
           <FadeIn direction="right">
             <div className="aspect-[3/4] overflow-hidden rounded-sm grayscale hover:grayscale-0 transition-all duration-1000">
               <img 
-                src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1200&auto=format&fit=crop" 
+                src={getContent('pkgs_phil_image', 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1200&auto=format&fit=crop')} 
                 alt="Philosophy" 
                 className="w-full h-full object-cover scale-110 hover:scale-100 transition-transform duration-1000"
               />
@@ -96,24 +98,22 @@ export const PackagesPage = () => {
             <div className="space-y-12">
               <div className="text-sm flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#1F2021] block" />
-                Filosofi Kami / (01)
+                {getContent('pkgs_phil_header', 'Filosofi Kami / (01)')}
               </div>
               <h2 className="text-4xl md:text-6xl font-medium tracking-tighter leading-[1.1]">
-                Lebih dari sekadar sebuah foto.
+                {getContent('pkgs_phil_title', 'Lebih dari sekadar sebuah foto.')}
               </h2>
               <p className="text-lg md:text-2xl text-gray-400 font-light leading-relaxed">
-                Kami percaya bahwa fotografi adalah tentang menangkap perasaan, 
-                bukan hanya penampilan. Setiap paket yang kami tawarkan dirancang 
-                untuk memberikan pengalaman yang nyaman, otentik, dan tak terlupakan.
+                {getContent('pkgs_phil_desc', 'Kami percaya bahwa fotografi adalah tentang menangkap perasaan, bukan hanya penampilan. Setiap paket yang kami tawarkan dirancang untuk memberikan pengalaman yang nyaman, otentik, dan tak terlupakan.')}
               </p>
               <div className="grid grid-cols-2 gap-8 pt-12 border-t border-gray-100">
                 <div>
-                  <h4 className="text-xs uppercase tracking-widest font-bold mb-4">Visi</h4>
-                  <p className="text-sm text-gray-500">Kualitas abadi yang melampaui tren masa kini.</p>
+                  <h4 className="text-xs uppercase tracking-widest font-bold mb-4">{getContent('pkgs_phil_vision_title', 'Visi')}</h4>
+                  <p className="text-sm text-gray-500">{getContent('pkgs_phil_vision_desc', 'Kualitas abadi yang melampaui tren masa kini.')}</p>
                 </div>
                 <div>
-                  <h4 className="text-xs uppercase tracking-widest font-bold mb-4">Misi</h4>
-                  <p className="text-sm text-gray-500">Menciptakan warisan visual untuk generasi mendatang.</p>
+                  <h4 className="text-xs uppercase tracking-widest font-bold mb-4">{getContent('pkgs_phil_mission_title', 'Misi')}</h4>
+                  <p className="text-sm text-gray-500">{getContent('pkgs_phil_mission_desc', 'Menciptakan warisan visual untuk generasi mendatang.')}</p>
                 </div>
               </div>
             </div>
@@ -228,31 +228,28 @@ export const PackagesPage = () => {
         <div className="max-w-[1400px] mx-auto px-6">
           <div className="text-sm flex items-center gap-2 mb-16 opacity-40">
             <span className="w-1.5 h-1.5 rounded-full bg-white block" />
-            Alur Kerja / (03)
+            {getContent('pkgs_process_header', 'Alur Kerja / (03)')}
           </div>
           <div className="grid md:grid-cols-3 gap-24">
             <FadeIn direction="up">
               <Camera size={40} className="mb-8 opacity-20" />
-              <h3 className="text-2xl font-medium mb-6">01. Perencanaan</h3>
+              <h3 className="text-2xl font-medium mb-6">{getContent('pkgs_proc1_title', '01. Perencanaan')}</h3>
               <p className="text-gray-400 font-light leading-relaxed">
-                Kita akan mendiskusikan visi, lokasi, dan detail teknis untuk 
-                memastikan setiap sudut sesuai dengan apa yang Anda impikan.
+                {getContent('pkgs_proc1_desc', 'Kita akan mendiskusikan visi, lokasi, dan detail teknis untuk memastikan setiap sudut sesuai dengan apa yang Anda impikan.')}
               </p>
             </FadeIn>
             <FadeIn direction="up" delay={0.1}>
               <Sparkles size={40} className="mb-8 opacity-20" />
-              <h3 className="text-2xl font-medium mb-6">02. Pemotretan</h3>
+              <h3 className="text-2xl font-medium mb-6">{getContent('pkgs_proc2_title', '02. Pemotretan')}</h3>
               <p className="text-gray-400 font-light leading-relaxed">
-                Nikmati momen Anda. Kami akan menangkap setiap tawa, tatapan, 
-                dan emosi secara organik tanpa paksaan pose yang kaku.
+                {getContent('pkgs_proc2_desc', 'Nikmati momen Anda. Kami akan menangkap setiap tawa, tatapan, dan emosi secara organik tanpa paksaan pose yang kaku.')}
               </p>
             </FadeIn>
             <FadeIn direction="up" delay={0.2}>
               <Heart size={40} className="mb-8 opacity-20" />
-              <h3 className="text-2xl font-medium mb-6">03. Hasil Akhir</h3>
+              <h3 className="text-2xl font-medium mb-6">{getContent('pkgs_proc3_title', '03. Hasil Akhir')}</h3>
               <p className="text-gray-400 font-light leading-relaxed">
-                Foto-foto Anda akan diproses dengan kurasi warna yang abadi 
-                dan dikirimkan dalam galeri digital berkualitas tinggi.
+                {getContent('pkgs_proc3_desc', 'Foto-foto Anda akan diproses dengan kurasi warna yang abadi dan dikirimkan dalam galeri digital berkualitas tinggi.')}
               </p>
             </FadeIn>
           </div>

@@ -120,31 +120,153 @@ const initialProjects = [
 ];
 
 const initialPackages = [
+  // Wedding
   {
-    title: "Sesi Personal",
-    description: "Sesi potret individu dengan fokus pada karakter dan kepribadian serta pencahayaan alami yang indah.",
-    price: "Rp 1.500.000",
-    features: ["2 Jam Sesi", "15 Foto Edit", "Semua File Mentah", "1 Lokasi"],
+    title: "Wedding Basic",
+    description: "Dokumentasi inti hari pernikahan Anda dengan satu fotografer profesional.",
+    price: "5.000.000",
+    category: "Wedding",
+    features: ["6 Jam Liputan", "1 Fotografer", "100 Foto Edit", "Flashdisk File Mentah", "1 Album Cetak"],
     order: 0
   },
   {
-    title: "Wedding Cinematic",
-    description: "Dokumentasi lengkap hari bahagia Anda dengan gaya sinematik yang abadi dan penuh emosi.",
-    price: "Rp 7.500.000",
-    features: ["8 Jam Liputan", "Wedding Film (3-5 menit)", "Teaser Instagram", "2 Videografer"],
+    title: "Wedding Silver",
+    description: "Paket lengkap dengan videografi inti untuk mengabadikan momen spesial Anda.",
+    price: "8.500.000",
+    category: "Wedding",
+    features: ["8 Jam Liputan", "1 Fotografer & 1 Videografer", "150 Foto Edit", "Cinematic Teaser (1 Menit)", "Flashdisk & Album Box"],
     order: 1
   },
   {
-    title: "Editorial Fashion",
-    description: "Produksi visual tingkat tinggi untuk kebutuhan brand dan fashion dengan standar industri.",
-    price: "Rp 3.000.000",
-    features: ["Sesi Studio/Outdoor", "10 Foto Retouch Pro", "Moodboard", "Creative Direction"],
+    title: "Wedding Gold",
+    description: "Layanan dokumentasi premium paling lengkap untuk pernikahan megah Anda.",
+    price: "15.000.000",
+    category: "Wedding",
+    features: ["Full Day Liputan", "2 Fotografer & 2 Videografer", "Semua Foto Edit", "Wedding Film (5 Menit)", "Drone Footage", "Exclusive Photo Book"],
     order: 2
+  },
+  // Prewedding
+  {
+    title: "Prewedding Nature",
+    description: "Sesi foto romantis dengan latar belakang keindahan alam terbuka.",
+    price: "3.500.000",
+    category: "Prewedding",
+    features: ["4 Jam Sesi", "1 Lokasi Outdoor", "20 Foto Edit", "Cetak Kanvas 40x60", "Make Up Standar"],
+    order: 3
+  },
+  {
+    title: "Prewedding Urban",
+    description: "Konsep foto prewedding modern dan stylish di tengah hiruk pikuk kota.",
+    price: "3.000.000",
+    category: "Prewedding",
+    features: ["3 Jam Sesi", "Lanskap Kota/Kafe", "15 Foto Edit", "Semua File Original", "Styling Guide"],
+    order: 4
+  },
+  {
+    title: "Prewedding Premium",
+    description: "Pengalaman prewedding eksklusif dengan konsep kustom dan tim lengkap.",
+    price: "7.000.000",
+    category: "Prewedding",
+    features: ["Full Day Sesi", "Multi Lokasi", "40 Foto Edit", "Cinematic Video Slide", "Professional MUA & Hairdo", "Exclusive Album"],
+    order: 5
+  },
+  // Personal & Others
+  {
+    title: "Sesi Personal",
+    description: "Sesi potret individu untuk portofolio, media sosial, atau kenangan pribadi.",
+    price: "1.500.000",
+    category: "Personal",
+    features: ["2 Jam Sesi", "1 Lokasi", "10 Foto Edit", "Semua File Mentah"],
+    order: 6
+  },
+  {
+    title: "Lamaran (Engagement)",
+    description: "Abadikan momen bersejarah pengikatan janji suci Anda bersama keluarga.",
+    price: "2.500.000",
+    category: "Event",
+    features: ["4 Jam Liputan", "1 Fotografer", "50 Foto Edit", "Online Gallery"],
+    order: 7
+  },
+  {
+    title: "Birthday Party",
+    description: "Buat pesta ulang tahun Anda (atau anak Anda) tak terlupakan selamanya.",
+    price: "2.000.000",
+    category: "Event",
+    features: ["3 Jam Liputan", "Dokumentasi Candid", "Semua File Original", "Highlight Video (30 Detik)"],
+    order: 8
+  },
+  {
+    title: "Editorial Fashion",
+    description: "Kebutuhan visual komersial untuk brand, katalog, atau kampanye fashion.",
+    price: "4.000.000",
+    category: "Commercial",
+    features: ["Sesi Studio/Outdoor", "High-End Retouching", "Creative Direction", "Moodboard"],
+    order: 9
+  },
+  {
+    title: "Maternity Session",
+    description: "Sesi foto hangat untuk merayakan perjalanan indah kehamilan Anda.",
+    price: "1.800.000",
+    category: "Personal",
+    features: ["1.5 Jam Sesi", "Home/Studio", "12 Foto Edit", "Properti Dasar"],
+    order: 10
   }
+];
+
+const initialSiteContent = [
+  // Branding & Hero
+  { key: 'brand_name', value: 'Agung Kun', type: 'text', label: 'Nama Brand', section: 'hero' },
+  { key: 'hero_title', value: 'moment', type: 'text', label: 'Hero Title', section: 'hero' },
+  { key: 'hero_subtitle', value: 'Oleh Agung Kun', type: 'text', label: 'Hero Subtitle', section: 'hero' },
+  { key: 'hero_image', value: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2000&auto=format&fit=crop', type: 'image', label: 'Hero Image', section: 'hero' },
+  
+  // Profil
+  { key: 'about_title', value: 'Portofolio ini adalah buku harian visual dari tempat, orang, dan momen yang saya kumpulkan melalui lensa.', type: 'textarea', label: 'Judul Profil', section: 'profil' },
+  { key: 'about_description', value: '“Saya memotret foto-foto yang autentik dan ekspresif, yang menangkap esensi dari setiap momen.”', type: 'textarea', label: 'Deskripsi Profil', section: 'profil' },
+  { key: 'about_image', value: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop', type: 'image', label: 'Foto Profil', section: 'profil' },
+  { key: 'about_location', value: 'Kyoto', type: 'text', label: 'Lokasi Foto Profil', section: 'profil' },
+  
+  // Showcase & Gallery
+  { key: 'showcase_badge', value: 'Showcase', type: 'text', label: 'Badge Showcase', section: 'gallery' },
+  { key: 'showcase_header', value: 'Album Pexels paling banyak dilihat', type: 'text', label: 'Header Showcase', section: 'gallery' },
+  { key: 'showcase_link_text', value: 'Lihat album', type: 'text', label: 'Teks Link Showcase', section: 'gallery' },
+  { key: 'showcase_link_url', value: '#', type: 'text', label: 'URL Link Showcase', section: 'gallery' },
+  { key: 'gallery_badge', value: 'Galeri', type: 'text', label: 'Badge Galeri', section: 'gallery' },
+  { key: 'gallery_header_small', value: 'Karya terpilih', type: 'text', label: 'Header Kecil Galeri', section: 'gallery' },
+  { key: 'gallery_header_big', value: 'Buku Harian Visual', type: 'text', label: 'Header Besar Galeri', section: 'gallery' },
+  { key: 'gallery_footer_text', value: 'Ingin melihat lebih banyak?', type: 'text', label: 'Teks Footer Galeri', section: 'gallery' },
+  { key: 'gallery_footer_button', value: 'Lihat galeri lengkap', type: 'text', label: 'Teks Tombol Footer Galeri', section: 'gallery' },
+  
+  // Contact & Social
+  { key: 'contact_whatsapp', value: '6287802023377', type: 'text', label: 'WhatsApp', section: 'contact' },
+  { key: 'contact_email', value: 'aguangkun@gmail.com', type: 'text', label: 'Email', section: 'contact' },
+  { key: 'contact_instagram', value: 'agungkunn', type: 'text', label: 'Instagram Username', section: 'contact' },
+  { key: 'contact_footer_title', value: 'Mari kita abadikan kisah Anda bersama.', type: 'textarea', label: 'Judul Footer Kontak', section: 'contact' }
 ];
 
 export async function seedDatabase() {
   try {
+    // Seed Site Content (Upsert strategy to preserve values but update metadata)
+    console.log('Sinkronisasi konten situs...');
+    const { data: existingContent } = await supabase
+      .from('site_content')
+      .select('*');
+
+    const contentToUpsert = initialSiteContent.map(newItem => {
+      const existing = existingContent?.find(e => e.key === newItem.key);
+      return {
+        ...newItem,
+        value: existing ? existing.value : newItem.value // Preserve existing value if it exists
+      };
+    });
+
+    const { error: contentSeedError } = await supabase
+      .from('site_content')
+      .upsert(contentToUpsert, { onConflict: 'key' });
+
+    if (contentSeedError) throw contentSeedError;
+    console.log('Konten situs berhasil disinkronkan!');
+
     // Seed Projects
     const { data: existingProjects, error: fetchError } = await supabase
       .from('projects')
@@ -163,23 +285,43 @@ export async function seedDatabase() {
       console.log('Data proyek berhasil diisi!');
     }
 
-    // Seed Packages
-    const { data: existingPackages, error: packageFetchError } = await supabase
+    // Seed Packages (Separate Insert and Update to avoid ID constraint issues)
+    console.log('Sinkronisasi data paket...');
+    const { data: existingPkgs } = await supabase
       .from('packages')
-      .select('id')
-      .limit(1);
+      .select('*');
 
-    if (packageFetchError) throw packageFetchError;
+    const toUpdate = [];
+    const toInsert = [];
 
-    if (!existingPackages || existingPackages.length === 0) {
-      console.log('Mengisi data paket...');
-      const { error: packageSeedError } = await supabase
-        .from('packages')
-        .insert(initialPackages);
-
-      if (packageSeedError) throw packageSeedError;
-      console.log('Data paket berhasil diisi!');
+    for (const newPkg of initialPackages) {
+      const existing = existingPkgs?.find(e => e.title === newPkg.title);
+      if (existing) {
+        toUpdate.push({
+          ...newPkg,
+          id: existing.id,
+          updated_at: new Date().toISOString()
+        });
+      } else {
+        toInsert.push(newPkg);
+      }
     }
+
+    if (toUpdate.length > 0) {
+      const { error: updateError } = await supabase
+        .from('packages')
+        .upsert(toUpdate);
+      if (updateError) throw updateError;
+    }
+
+    if (toInsert.length > 0) {
+      const { error: insertError } = await supabase
+        .from('packages')
+        .insert(toInsert);
+      if (insertError) throw insertError;
+    }
+
+    console.log('Data paket berhasil disinkronkan!');
   } catch (error) {
     console.error('Terjadi kesalahan saat mengisi pangkalan data:', error);
   }

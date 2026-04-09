@@ -2,9 +2,11 @@ import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useSiteContent } from '../../hooks/useSiteContent';
 
 export const Footer = () => {
   const { scrollYProgress } = useScroll();
+  const { getContent } = useSiteContent();
   const y = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
   const scrollToTop = () => {
@@ -23,10 +25,10 @@ export const Footer = () => {
               </div>
 
               <h2 className="text-4xl md:text-7xl font-medium leading-[0.9] mb-12 tracking-tighter max-w-md text-gray-100">
-                Mari kita abadikan kisah Anda bersama.
+                {getContent('contact_footer_title', 'Mari kita abadikan kisah Anda bersama.')}
               </h2>
 
-              <a href="https://wa.me/6287802023377" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-4 bg-green-500 text-white px-10 py-6 rounded-full text-sm font-medium hover:bg-green-600 transition-all hover:scale-105 mb-16">
+              <a href={`https://wa.me/${getContent('contact_whatsapp', '6287802023377')}`} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-4 bg-green-500 text-white px-10 py-6 rounded-full text-sm font-medium hover:bg-green-600 transition-all hover:scale-105 mb-16">
                 Hubungi via WhatsApp
                 <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:translate-x-1 transition-transform">
                   <ArrowRight size={16} />
@@ -37,11 +39,11 @@ export const Footer = () => {
             <div className="pt-12 border-t border-white/10">
               <p className="text-xs uppercase tracking-widest text-gray-500 mb-6">Hubungi saya di</p>
               <div className="flex flex-col gap-4 mb-12">
-                <a href="https://wa.me/6287802023377" target="_blank" rel="noopener noreferrer" className="text-3xl md:text-6xl font-medium block hover:text-green-500 transition-colors tracking-tighter leading-none">
-                  +62 878-0202-3377
+                <a href={`https://wa.me/${getContent('contact_whatsapp', '6287802023377')}`} target="_blank" rel="noopener noreferrer" className="text-3xl md:text-6xl font-medium block hover:text-green-500 transition-colors tracking-tighter leading-none">
+                  +{getContent('contact_whatsapp', '6287802023377')}
                 </a>
-                <a href="mailto:aguangkun@gmail.com" className="text-2xl md:text-4xl font-medium block hover:text-gray-400 transition-colors tracking-tighter leading-none">
-                  aguangkun@gmail.com
+                <a href={`mailto:${getContent('contact_email', 'aguangkun@gmail.com')}`} className="text-2xl md:text-4xl font-medium block hover:text-gray-400 transition-colors tracking-tighter leading-none">
+                  {getContent('contact_email', 'aguangkun@gmail.com')}
                 </a>
               </div>
               <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
@@ -49,7 +51,7 @@ export const Footer = () => {
                   Berbasis di Indonesia. Tersedia untuk penugasan di seluruh dunia.
                 </p>
                 <div className="flex gap-8 text-xs uppercase tracking-widest font-medium">
-                  <a href="https://instagram.com/agungkunn" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-opacity">Instagram</a>
+                  <a href={`https://instagram.com/${getContent('contact_instagram', 'agungkunn')}`} target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-opacity">Instagram</a>
                   <a href="#" className="hover:text-gray-400 transition-opacity">Twitter / X</a>
                   <a href="#" className="hover:text-gray-400 transition-opacity">Pexels</a>
                 </div>
@@ -71,13 +73,13 @@ export const Footer = () => {
         <div className="relative pt-12 border-t border-white/5">
           <div className="text-center overflow-hidden">
             <h1 className="text-[24vw] leading-[0.7] font-medium tracking-tighter text-white/5 select-none pointer-events-none">
-              moment
+              {getContent('hero_title', 'moment')}
             </h1>
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-center mt-12 gap-6">
             <div className="flex items-center gap-8 text-[10px] uppercase tracking-[0.3em] text-gray-600">
-              <p>© 2026 Agung Kun</p>
+              <p>© 2026 {getContent('brand_name', 'Agung Kun')}</p>
               <p>Hak cipta dilindungi undang-undang</p>
               <Link to="/admin" className="hover:text-white transition-colors">Admin</Link>
             </div>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { FadeIn } from '../UI/FadeIn';
+import { useSiteContent } from '../../hooks/useSiteContent';
 
 interface Project {
   id: string;
@@ -18,6 +19,7 @@ interface Project {
 
 export const Gallery = () => {
   const navigate = useNavigate();
+  const { getContent } = useSiteContent();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -72,11 +74,15 @@ export const Gallery = () => {
       <div className="flex justify-between items-start mb-24">
         <div className="text-sm flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-[#1F2021] block" />
-          Galeri / (03)
+          {getContent('gallery_badge', 'Galeri')} / (03)
         </div>
         <div className="text-right">
-          <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">Karya terpilih</p>
-          <p className="text-xl font-medium tracking-tight">Buku Harian Visual</p>
+          <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">
+            {getContent('gallery_header_small', 'Karya terpilih')}
+          </p>
+          <p className="text-xl font-medium tracking-tight">
+            {getContent('gallery_header_big', 'Buku Harian Visual')}
+          </p>
         </div>
       </div>
 
@@ -124,9 +130,9 @@ export const Gallery = () => {
 
       <div className="mt-40 flex flex-col items-center">
         <div className="w-px h-24 bg-gray-100 mb-12" />
-        <p className="text-gray-400 text-sm mb-8 uppercase tracking-widest">Ingin melihat lebih banyak?</p>
+        <p className="text-gray-400 text-sm mb-8 uppercase tracking-widest">{getContent('gallery_footer_text', 'Ingin melihat lebih banyak?')}</p>
         <a href="/galeri" className="group inline-flex items-center gap-4 bg-[#1F2021] text-white px-12 py-6 rounded-full text-sm font-medium hover:bg-gray-800 transition-all hover:scale-105 active:scale-95">
-          Lihat galeri lengkap
+          {getContent('gallery_footer_button', 'Lihat galeri lengkap')}
           <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center group-hover:translate-x-1 transition-transform">
             <ArrowRight size={14} />
           </div>

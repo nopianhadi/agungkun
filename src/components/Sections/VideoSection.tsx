@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { FadeIn } from '../UI/FadeIn';
+import { useSiteContent } from '../../hooks/useSiteContent';
 
 interface Project {
   id: string;
@@ -19,6 +20,7 @@ interface Project {
 export const VideoSection = () => {
   const [videoProjects, setVideoProjects] = useState<Project[]>([]);
   const navigate = useNavigate();
+  const { getContent } = useSiteContent();
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -52,11 +54,15 @@ export const VideoSection = () => {
       <div className="flex justify-between items-start mb-24">
         <div className="text-sm flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500 block animate-pulse" />
-          Video Portfolio / (04)
+          {getContent('video_section_title', 'Video Portfolio')} / (04)
         </div>
         <div className="text-right">
-          <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">Pekerjaan Sinematik</p>
-          <p className="text-xl font-medium tracking-tight">Kisah dalam Gerakan</p>
+          <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">
+            {getContent('video_section_subtitle', 'Pekerjaan Sinematik')}
+          </p>
+          <p className="text-xl font-medium tracking-tight">
+            {getContent('video_section_quote', 'Kisah dalam Gerakan')}
+          </p>
         </div>
       </div>
 

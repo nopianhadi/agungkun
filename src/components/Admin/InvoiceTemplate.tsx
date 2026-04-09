@@ -41,39 +41,49 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
     return (
       <div 
         ref={ref}
-        className="bg-white p-[80px] w-[794px] min-h-[1123px] text-[#1F2021] font-sans"
-        style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}
+        className="bg-white p-[80px] w-[794px] min-h-[1123px] font-sans"
+        style={{ 
+          position: 'absolute', 
+          left: '-9999px', 
+          top: '-9999px',
+          backgroundColor: '#FFFFFF',
+          color: '#1F2021',
+          lineHeight: '1.5'
+        }}
       >
-        {/* Header */}
-        <div className="flex justify-between items-start mb-20">
+        {/* Header Section */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '48px' }}>
           <div>
-            <h1 className="text-4xl font-medium tracking-tighter italic mb-2">moment /</h1>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400">Photography Portfolio</p>
+            <h1 className="text-4xl font-medium tracking-tighter italic mb-2" style={{ color: '#1F2021' }}>moment /</h1>
+            <p className="text-[10px] uppercase tracking-[0.3em]" style={{ color: '#9CA3AF' }}>Photography Portfolio</p>
           </div>
-          <div className="text-right">
-            <h2 className="text-2xl font-medium tracking-tight mb-2 uppercase">Invoice</h2>
-            <p className="text-xs text-gray-400 leading-relaxed">
+          <div style={{ textAlign: 'right' }}>
+            <h2 className="text-2xl font-medium tracking-tight mb-2 uppercase" style={{ color: '#1F2021' }}>Invoice</h2>
+            <p className="text-xs" style={{ color: '#9CA3AF', lineHeight: '1.6' }}>
               No. #{invoiceNumber}<br />
               {date}
             </p>
           </div>
         </div>
 
-        {/* Brand Contact */}
-        <div className="grid grid-cols-2 gap-20 mb-20 pb-12 border-b border-gray-100">
+        {/* Divider */}
+        <div style={{ height: '1px', backgroundColor: '#F3F4F6', marginBottom: '40px' }} />
+
+        {/* Client & Studio Info */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginBottom: '40px' }}>
           <div>
-            <h3 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-4">Dari:</h3>
-            <p className="text-sm font-medium">Moment Photography Studio</p>
-            <p className="text-xs text-gray-500 leading-relaxed mt-2">
+            <h3 className="text-[10px] uppercase tracking-widest font-bold mb-4" style={{ color: '#9CA3AF' }}>Dari:</h3>
+            <p className="text-sm font-medium" style={{ color: '#1F2021' }}>Moment Photography Studio</p>
+            <p className="text-xs mt-2" style={{ color: '#6B7280', lineHeight: '1.6' }}>
               Jl. Artistik No. 88, Jakarta Selatan<br />
               +62 878-0202-3377<br />
               hello@momentphotography.com
             </p>
           </div>
           <div>
-            <h3 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-4">Untuk:</h3>
-            <p className="text-sm font-medium">{booking.client_name}</p>
-            <p className="text-xs text-gray-500 leading-relaxed mt-2">
+            <h3 className="text-[10px] uppercase tracking-widest font-bold mb-4" style={{ color: '#9CA3AF' }}>Untuk:</h3>
+            <p className="text-sm font-medium" style={{ color: '#1F2021' }}>{booking.client_name}</p>
+            <p className="text-xs mt-2" style={{ color: '#6B7280', lineHeight: '1.6' }}>
               {booking.whatsapp}<br />
               {booking.email || '-'}<br />
               {booking.city}
@@ -81,20 +91,17 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
           </div>
         </div>
 
-        {/* Event Details */}
-        <div className="mb-20">
-          <div className="flex items-center gap-4 mb-6">
-            <h3 className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Rincian Acara</h3>
-            <div className="h-px flex-1 bg-gray-50" />
-          </div>
-          <div className="grid grid-cols-3 gap-8">
+        {/* Event Details Section */}
+        <div style={{ marginBottom: '48px', padding: '32px', border: '1px solid #F3F4F6', borderRadius: '4px' }}>
+          <h3 className="text-[10px] uppercase tracking-widest font-bold mb-6" style={{ color: '#9CA3AF' }}>Informasi Acara</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '32px' }}>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">Jenis Acara</p>
-              <p className="text-sm font-medium">{booking.event_type}</p>
+              <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: '#9CA3AF' }}>Jenis Acara</p>
+              <p className="text-sm font-medium" style={{ color: '#1F2021' }}>{booking.event_type}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">Tanggal</p>
-              <p className="text-sm font-medium">
+              <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: '#9CA3AF' }}>Tanggal</p>
+              <p className="text-sm font-medium" style={{ color: '#1F2021' }}>
                 {new Date(booking.event_date).toLocaleDateString('id-ID', {
                   day: 'numeric',
                   month: 'long',
@@ -103,86 +110,88 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
               </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">Lokasi</p>
-              <p className="text-sm font-medium">{booking.address}</p>
+              <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: '#9CA3AF' }}>Lokasi</p>
+              <p className="text-sm font-medium" style={{ color: '#1F2021' }}>{booking.address}</p>
             </div>
           </div>
         </div>
 
-        {/* Items Table */}
-        <table className="w-full mb-20">
-          <thead>
-            <tr className="border-b border-gray-100">
-              <th className="text-left py-4 text-[10px] uppercase tracking-widest text-gray-400">Deskripsi Layanan</th>
-              <th className="text-right py-4 text-[10px] uppercase tracking-widest text-gray-400">Total</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            <tr>
-              <td className="py-8">
-                <p className="font-medium text-sm">Paket {pkg?.title || 'Layanan Fotografi'}</p>
-                <p className="text-xs text-gray-400 mt-1 max-w-sm leading-relaxed">
-                  Profesional dokumentasi {booking.event_type.toLowerCase()} mencakup sesi pemotretan 
-                  dan proses editing standar industri.
-                </p>
-              </td>
-              <td className="py-8 text-right text-sm font-medium">
-                Rp {booking.total_price.toLocaleString('id-ID')}
-              </td>
-            </tr>
-            {booking.addons && (
+        {/* Services Table */}
+        <div style={{ marginBottom: '48px' }}>
+          <table className="w-full">
+            <thead>
+              <tr style={{ borderBottom: '1px solid #F3F4F6' }}>
+                <th className="text-left py-4 text-[10px] uppercase tracking-widest" style={{ color: '#9CA3AF' }}>Deskripsi Layanan</th>
+                <th className="text-right py-4 text-[10px] uppercase tracking-widest" style={{ color: '#9CA3AF' }}>Total</th>
+              </tr>
+            </thead>
+            <tbody>
               <tr>
                 <td className="py-8">
-                  <p className="font-medium text-sm">Add-On Tambahan</p>
-                  <p className="text-xs text-gray-400 mt-1">{booking.addons}</p>
+                  <p className="font-medium text-sm" style={{ color: '#1F2021' }}>Paket {pkg?.title || 'Layanan Fotografi'}</p>
+                  <p className="text-xs mt-2 max-w-sm leading-relaxed" style={{ color: '#9CA3AF' }}>
+                    Dokumentasi profesional untuk acara {booking.event_type.toLowerCase()} Anda. 
+                    Termasuk sesi pemotretan dan editing pasca-produksi standar industri.
+                  </p>
                 </td>
-                <td className="py-8 text-right text-sm font-medium">-</td>
+                <td className="py-8 text-right text-sm font-medium" style={{ color: '#1F2021' }}>
+                  Rp {booking.total_price.toLocaleString('id-ID')}
+                </td>
               </tr>
-            )}
-          </tbody>
-        </table>
+              {booking.addons && (
+                <tr style={{ borderTop: '1px solid #F9FAFB' }}>
+                  <td className="py-8">
+                    <p className="font-medium text-sm" style={{ color: '#1F2021' }}>Add-On Tambahan</p>
+                    <p className="text-xs mt-1" style={{ color: '#9CA3AF' }}>{booking.addons}</p>
+                  </td>
+                  <td className="py-8 text-right text-sm font-medium" style={{ color: '#1F2021' }}>-</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-        {/* Summary */}
-        <div className="flex justify-end">
-          <div className="w-72 space-y-4">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Subtotal</span>
-              <span>Rp {booking.total_price.toLocaleString('id-ID')}</span>
+        {/* Summary Background Shading */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '80px' }}>
+          <div style={{ width: '320px', backgroundColor: '#F9FAFB', padding: '32px', borderRadius: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '16px' }}>
+              <span style={{ color: '#9CA3AF' }}>Subtotal</span>
+              <span style={{ color: '#1F2021' }}>Rp {booking.total_price.toLocaleString('id-ID')}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">DP Dibayarkan (30%)</span>
-              <span className="text-green-600">- Rp {booking.dp_amount.toLocaleString('id-ID')}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '16px' }}>
+              <span style={{ color: '#9CA3AF' }}>DP Dibayarkan</span>
+              <span style={{ color: '#16A34A' }}>- Rp {booking.dp_amount.toLocaleString('id-ID')}</span>
             </div>
             {finalPaid > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Pelunasan Dibayar</span>
-                <span className="text-green-600">- Rp {finalPaid.toLocaleString('id-ID')}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '16px' }}>
+                <span style={{ color: '#9CA3AF' }}>Pelunasan</span>
+                <span style={{ color: '#16A34A' }}>- Rp {finalPaid.toLocaleString('id-ID')}</span>
               </div>
             )}
-            <div className="h-px bg-gray-100 my-4" />
-            <div className="flex justify-between">
-              <span className="text-xs uppercase tracking-[0.2em] font-bold">Total Sisa Tagihan</span>
-              <span className="text-xl font-medium tracking-tight">
+            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '20px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold" style={{ color: '#1F2021' }}>Sisa Tagihan</span>
+              <span className="text-2xl font-medium tracking-tight" style={{ color: '#1F2021' }}>
                 Rp {balanceDue.toLocaleString('id-ID')}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="absolute bottom-[80px] left-[80px] right-[80px]">
-          <div className="h-px bg-gray-100 mb-8" />
-          <div className="grid grid-cols-2 items-end">
+        {/* Footer Fixed at Bottom */}
+        <div style={{ position: 'absolute', bottom: '80px', left: '80px', right: '80px' }}>
+          <div style={{ height: '1px', backgroundColor: '#F3F4F6', marginBottom: '32px' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'flex-end' }}>
             <div>
-              <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-4">Syarat & Ketentuan:</h4>
-              <ul className="text-[9px] text-gray-400 space-y-1 list-disc pl-4 leading-relaxed">
-                <li>Pelunasan wajib dilakukan maksimal H-7 sebelum hari acara.</li>
-                <li>Pembatalan setelah DP tidak dapat dikembalikan (Non-refundable).</li>
-                <li>Estimasi pengerjaan hasil foto adalah 14-30 hari kerja.</li>
+              <h4 className="text-[10px] uppercase tracking-widest font-bold mb-4" style={{ color: '#9CA3AF' }}>Syarat & Ketentuan:</h4>
+              <ul className="text-[9px] space-y-2 list-disc pl-4" style={{ color: '#9CA3AF', lineHeight: '1.6' }}>
+                <li>Konfirmasi pelunasan paling lambat H-7 sebelum acara.</li>
+                <li>DP yang sudah dibayarkan bersifat non-refundable.</li>
+                <li>Hasil dokumentasi akan diserahkan dalam 14-30 hari kerja.</li>
               </ul>
             </div>
-            <div className="text-right">
-              <p className="text-[10px] uppercase tracking-widest text-gray-300 italic">Terima kasih atas kepercayaan Anda.</p>
+            <div style={{ textAlign: 'right' }}>
+              <p className="text-[10px] uppercase tracking-widest italic" style={{ color: '#D1D5DB' }}>Thank you for choosing Moment Studio.</p>
             </div>
           </div>
         </div>

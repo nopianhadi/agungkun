@@ -1,76 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  LogOut, 
-  X, 
-  Save, 
-  FileText, 
-  ChevronRight, 
-  Download, 
-  Upload,
-  ExternalLink
-} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Plus, LogOut } from 'lucide-react';
 import { seedDatabase } from '../../lib/seed';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
-import { InvoiceTemplate } from './InvoiceTemplate';
+import { useSiteContent } from '../../hooks/useSiteContent';
 
-interface Project {
-  id: string;
-  title: string;
-  location: string;
-  mainImg: string;
-  tag: string;
-  description: string;
-  video_url?: string;
-  detailImages: string[];
-  order: number;
-}
+// Types
+import { Project, Booking, Package, Testimonial, SiteService, ShowcaseItem, OperationType } from './Dashboard/types';
 
-interface Booking {
-  id: string;
-  client_name: string;
-  whatsapp: string;
-  email: string;
-  instagram: string;
-  event_type: string;
-  event_date: string;
-  city: string;
-  address: string;
-  package_id: string;
-  addons: string;
-  promo_code: string;
-  total_price: number;
-  dp_amount: number;
-  final_payment_amount: number;
-  final_payment_proof_url: string;
-  bank_ref: string;
-  proof_url: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  created_at: string;
-}
+// Tab Components
+import { ProjectsTab } from './Dashboard/tabs/ProjectsTab';
+import { PackagesTab } from './Dashboard/tabs/PackagesTab';
+import { BookingsTab } from './Dashboard/tabs/BookingsTab';
+import { TestimonialsTab } from './Dashboard/tabs/TestimonialsTab';
+import { ServicesTab } from './Dashboard/tabs/ServicesTab';
+import { ShowcaseTab } from './Dashboard/tabs/ShowcaseTab';
+import { SettingsTab } from './Dashboard/tabs/SettingsTab';
 
-enum OperationType {
-  CREATE = 'create',
-  UPDATE = 'update',
-  DELETE = 'delete',
-  LIST = 'list',
-  GET = 'get',
-  WRITE = 'write',
-}
-
-interface Package {
-  id: string;
-  title: string;
-  description: string;
-  price: string;
-  features: string[];
-  order: number;
-}
+// Modal Components
+import { ProjectModal } from './Dashboard/modals/ProjectModal';
+import { PackageModal } from './Dashboard/modals/PackageModal';
+import { BookingDetailModal } from './Dashboard/modals/BookingDetailModal';
+import { TestimonialModal } from './Dashboard/modals/TestimonialModal';
+import { ServiceModal } from './Dashboard/modals/ServiceModal';
+import { ShowcaseModal } from './Dashboard/modals/ShowcaseModal';
 
 const handleSupabaseError = (error: any, operationType: OperationType, path: string | null) => {
   console.error(`Supabase Error (${operationType}) on ${path}:`, error.message || error);
@@ -78,259 +31,114 @@ const handleSupabaseError = (error: any, operationType: OperationType, path: str
 };
 
 export const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState<'projects' | 'packages' | 'bookings'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'packages' | 'bookings' | 'testimonials' | 'services' | 'showcase' | 'settings'>('projects');
+  
+  // Data State
   const [projects, setProjects] = useState<Project[]>([]);
   const [packages, setPackages] = useState<Package[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [siteServices, setSiteServices] = useState<SiteService[]>([]);
+  const [showcaseItems, setShowcaseItems] = useState<ShowcaseItem[]>([]);
+  
+  // Site Content
+  const { items: siteItems, refresh: refreshSite } = useSiteContent();
+  const [editingContent, setEditingContent] = useState<Record<string, string>>({});
+  const [isUpdatingSite, setIsUpdatingSite] = useState(false);
+
+  // Modal Visibility State
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const invoiceRef = React.useRef<HTMLDivElement>(null);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [isBookingDetailOpen, setIsBookingDetailOpen] = useState(false);
+  const [isTestiModalOpen, setIsTestiModalOpen] = useState(false);
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [isShowcaseModalOpen, setIsShowcaseModalOpen] = useState(false);
+
+  // Editing Item State
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editingPackage, setEditingPackage] = useState<Package | null>(null);
-  
-  // Pelunasan State
-  const [finalPaymentAmount, setFinalPaymentAmount] = useState<number>(0);
-  const [finalPaymentProof, setFinalPaymentProof] = useState<File | null>(null);
-  const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    title: '',
-    location: '',
-    mainImg: '',
-    tag: '',
-    description: '',
-    videoUrl: '',
-    detailImages: '',
-    order: 0
-  });
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
+  const [editingService, setEditingService] = useState<SiteService | null>(null);
+  const [editingShowcase, setEditingShowcase] = useState<ShowcaseItem | null>(null);
 
-  const [packageData, setPackageData] = useState({
-    title: '',
-    description: '',
-    price: '',
-    features: '',
-    order: 0
-  });
 
   useEffect(() => {
     seedDatabase().then(() => {
-      fetchProjects();
-      fetchPackages();
-      fetchBookings();
+      fetchAllData();
     });
   }, []);
 
-  useEffect(() => {
-    if (selectedBooking) {
-      setFinalPaymentAmount(selectedBooking.final_payment_amount || 0);
-      setFinalPaymentProof(null);
-    }
-  }, [selectedBooking]);
-
-  const handleDownloadInvoice = async () => {
-    if (!selectedBooking || !invoiceRef.current) return;
-    
-    setIsGeneratingPDF(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      const canvas = await html2canvas(invoiceRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        format: 'a4',
-        unit: 'px'
-      });
-      
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Invoice-Moment-${selectedBooking.client_name.replace(/\s+/g, '-')}.pdf`);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Gagal membuat invoice. Silakan coba lagi.');
-    } finally {
-      setIsGeneratingPDF(false);
-    }
-  };
-
-  const handleSavePelunasan = async () => {
-    if (!selectedBooking) return;
-    setIsUpdatingPayment(true);
-    
-    try {
-      let proofUrl = selectedBooking.final_payment_proof_url;
-
-      if (finalPaymentProof) {
-        const fileExt = finalPaymentProof.name.split('.').pop();
-        const fileName = `pelunasan-${selectedBooking.id}-${Math.random()}.${fileExt}`;
-        const filePath = `proofs/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('proofs')
-          .upload(filePath, finalPaymentProof);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('proofs')
-          .getPublicUrl(filePath);
-        
-        proofUrl = publicUrl;
-      }
-
-      const { error } = await supabase
-        .from('bookings')
-        .update({ 
-          final_payment_amount: finalPaymentAmount,
-          final_payment_proof_url: proofUrl,
-          status: finalPaymentAmount + selectedBooking.dp_amount >= selectedBooking.total_price ? 'completed' : selectedBooking.status
-        })
-        .eq('id', selectedBooking.id);
-
-      if (error) throw error;
-      
-      const updatedBooking = { 
-        ...selectedBooking, 
-        final_payment_amount: finalPaymentAmount,
-        final_payment_proof_url: proofUrl,
-        status: finalPaymentAmount + selectedBooking.dp_amount >= selectedBooking.total_price ? 'completed' : selectedBooking.status
-      } as Booking;
-
-      setBookings(bookings.map(b => b.id === selectedBooking.id ? updatedBooking : b));
-      setSelectedBooking(updatedBooking);
-      alert('Pelunasan berhasil disimpan.');
-    } catch (error) {
-      console.error('Error saving pelunasan:', error);
-      alert('Gagal menyimpan pelunasan.');
-    } finally {
-      setIsUpdatingPayment(false);
-    }
-  };
-
-  const fetchBookings = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setBookings(data || []);
-    } catch (error) {
-      handleSupabaseError(error, OperationType.GET, 'bookings');
-    }
+  const fetchAllData = () => {
+    fetchProjects();
+    fetchPackages();
+    fetchBookings();
+    fetchTestimonials();
+    fetchSiteServices();
+    fetchShowcase();
   };
 
   const fetchProjects = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .order('order', { ascending: true });
-
-      if (error) throw error;
-      
-      const mappedProjects = (data || []).map(p => ({
-        id: p.id,
-        title: p.title,
-        location: p.location,
-        mainImg: p.main_img,
-        tag: p.tag,
-        description: p.description || '',
-        video_url: p.video_url || '',
-        detailImages: p.detail_images || [],
-        order: p.order
-      }));
-      setProjects(mappedProjects);
-    } catch (error) {
-      handleSupabaseError(error, OperationType.GET, 'projects');
-    }
+    const { data, error } = await supabase.from('projects').select('*').order('order', { ascending: true });
+    if (!error) setProjects((data || []).map(p => ({
+      ...p,
+      mainImg: p.main_img,
+      detailImages: p.detail_images || [],
+      video_url: p.video_url || ''
+    })));
   };
 
   const fetchPackages = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('packages')
-        .select('*')
-        .order('order', { ascending: true });
+    const { data, error } = await supabase.from('packages').select('*').order('order', { ascending: true });
+    if (!error) setPackages(data || []);
+  };
 
-      if (error) throw error;
-      setPackages(data || []);
-    } catch (error) {
-      handleSupabaseError(error, OperationType.GET, 'packages');
-    }
+  const fetchBookings = async () => {
+    const { data, error } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
+    if (!error) setBookings(data || []);
+  };
+
+  const fetchTestimonials = async () => {
+    const { data, error } = await supabase.from('testimonials').select('*').order('order', { ascending: true });
+    if (!error) setTestimonials(data || []);
+  };
+
+  const fetchSiteServices = async () => {
+    const { data, error } = await supabase.from('site_services').select('*').order('order', { ascending: true });
+    if (!error) setSiteServices(data || []);
+  };
+
+  const fetchShowcase = async () => {
+    const { data, error } = await supabase.from('showcase').select('*').order('order', { ascending: true });
+    if (!error) setShowcaseItems(data || []);
   };
 
   useEffect(() => {
-    const projectChannel = supabase
-      .channel('projects_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
-        fetchProjects();
-      })
-      .subscribe();
+    if (siteItems) {
+      const initial: Record<string, string> = {};
+      siteItems.forEach(item => initial[item.key] = item.value);
+      setEditingContent(initial);
+    }
+  }, [siteItems]);
 
-    const packageChannel = supabase
-      .channel('packages_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'packages' }, () => {
-        fetchPackages();
-      })
-      .subscribe();
-
-    const bookingChannel = supabase
-      .channel('bookings_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => {
-        fetchBookings();
-      })
-      .subscribe();
+  // Realtime Listeners
+  useEffect(() => {
+    const channels = [
+      supabase.channel('projects_changes').on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, fetchProjects),
+      supabase.channel('packages_changes').on('postgres_changes', { event: '*', schema: 'public', table: 'packages' }, fetchPackages),
+      supabase.channel('bookings_changes').on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, fetchBookings),
+      supabase.channel('testimonials_changes').on('postgres_changes', { event: '*', schema: 'public', table: 'testimonials' }, fetchTestimonials),
+      supabase.channel('services_changes').on('postgres_changes', { event: '*', schema: 'public', table: 'site_services' }, fetchSiteServices),
+      supabase.channel('showcase_changes').on('postgres_changes', { event: '*', schema: 'public', table: 'showcase' }, fetchShowcase)
+    ].map(c => c.subscribe());
 
     return () => {
-      supabase.removeChannel(projectChannel);
-      supabase.removeChannel(packageChannel);
-      supabase.removeChannel(bookingChannel);
+      channels.forEach(c => supabase.removeChannel(c));
     };
   }, []);
 
-  const handleOpenModal = (project?: Project) => {
-    if (project) {
-      setEditingProject(project);
-      setFormData({
-        title: project.title,
-        location: project.location,
-        mainImg: project.mainImg,
-        tag: project.tag,
-        description: project.description || '',
-        videoUrl: project.video_url || '',
-        detailImages: project.detailImages.join(', '),
-        order: project.order
-      });
-    } else {
-      setEditingProject(null);
-      setFormData({
-        title: '',
-        location: '',
-        mainImg: '',
-        tag: '',
-        description: '',
-        videoUrl: '',
-        detailImages: '',
-        order: projects.length
-      });
-    }
-    setIsModalOpen(true);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Handlers
+  const handleProjectSubmit = async (formData: any) => {
     const payload = {
       title: formData.title,
       location: formData.location,
@@ -338,90 +146,44 @@ export const Dashboard = () => {
       tag: formData.tag,
       description: formData.description,
       video_url: formData.videoUrl,
-      detail_images: formData.detailImages.split(',').map(s => s.trim()).filter(s => s !== ''),
+      detail_images: formData.detailImages.split(',').map((s: string) => s.trim()).filter((s: string) => s !== ''),
       order: formData.order,
       updated_at: new Date().toISOString()
     };
 
     try {
       if (editingProject) {
-        const { error } = await supabase
-          .from('projects')
-          .update(payload)
-          .eq('id', editingProject.id);
-        if (error) throw error;
+        await supabase.from('projects').update(payload).eq('id', editingProject.id);
       } else {
-        const { error } = await supabase
-          .from('projects')
-          .insert([{ ...payload, created_at: new Date().toISOString() }]);
-        if (error) throw error;
+        await supabase.from('projects').insert([{ ...payload, created_at: new Date().toISOString() }]);
       }
-      setIsModalOpen(false);
+      setIsProjectModalOpen(false);
     } catch (error) {
       handleSupabaseError(error, OperationType.WRITE, 'projects');
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus proyek ini?')) {
-      try {
-        const { error } = await supabase
-          .from('projects')
-          .delete()
-          .eq('id', id);
-        if (error) throw error;
-      } catch (error) {
-        handleSupabaseError(error, OperationType.DELETE, `projects/${id}`);
-      }
+  const handleProjectDelete = async (id: string) => {
+    if (window.confirm('Hapus proyek ini?')) {
+      await supabase.from('projects').delete().eq('id', id);
     }
   };
 
-  const handleOpenPackageModal = (pkg?: Package) => {
-    if (pkg) {
-      setEditingPackage(pkg);
-      setPackageData({
-        title: pkg.title,
-        description: pkg.description || '',
-        price: pkg.price || '',
-        features: pkg.features.join(', '),
-        order: pkg.order
-      });
-    } else {
-      setEditingPackage(null);
-      setPackageData({
-        title: '',
-        description: '',
-        price: '',
-        features: '',
-        order: packages.length
-      });
-    }
-    setIsPackageModalOpen(true);
-  };
-
-  const handlePackageSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePackageSubmit = async (packageData: any) => {
     const payload = {
       title: packageData.title,
       description: packageData.description,
       price: packageData.price,
-      features: packageData.features.split(',').map(s => s.trim()).filter(s => s !== ''),
+      category: packageData.category,
+      features: packageData.features.split(',').map((s: string) => s.trim()).filter((s: string) => s !== ''),
       order: packageData.order,
       updated_at: new Date().toISOString()
     };
-
     try {
       if (editingPackage) {
-        const { error } = await supabase
-          .from('packages')
-          .update(payload)
-          .eq('id', editingPackage.id);
-        if (error) throw error;
+        await supabase.from('packages').update(payload).eq('id', editingPackage.id);
       } else {
-        const { error } = await supabase
-          .from('packages')
-          .insert([{ ...payload, created_at: new Date().toISOString() }]);
-        if (error) throw error;
+        await supabase.from('packages').insert([{ ...payload, created_at: new Date().toISOString() }]);
       }
       setIsPackageModalOpen(false);
     } catch (error) {
@@ -429,18 +191,73 @@ export const Dashboard = () => {
     }
   };
 
-  const handlePackageDelete = async (id: string) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus paket ini?')) {
-      try {
-        const { error } = await supabase
-          .from('packages')
-          .delete()
-          .eq('id', id);
-        if (error) throw error;
-      } catch (error) {
-        handleSupabaseError(error, OperationType.DELETE, `packages/${id}`);
-      }
+  const handleTestiSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const payload = {
+      name: fd.get('name') as string,
+      quote: fd.get('quote') as string,
+      location: fd.get('location') as string,
+      image_url: fd.get('image_url') as string,
+      order: parseInt(fd.get('order') as string) || 0
+    };
+    if (editingTestimonial) {
+      await supabase.from('testimonials').update(payload).eq('id', editingTestimonial.id);
+    } else {
+      await supabase.from('testimonials').insert([payload]);
     }
+    setIsTestiModalOpen(false);
+  };
+
+  const handleServiceSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const payload = {
+      num: fd.get('num') as string,
+      title: fd.get('title') as string,
+      description: fd.get('description') as string,
+      order: parseInt(fd.get('order') as string) || 0
+    };
+    if (editingService) {
+      await supabase.from('site_services').update(payload).eq('id', editingService.id);
+    } else {
+      await supabase.from('site_services').insert([payload]);
+    }
+    setIsServiceModalOpen(false);
+  };
+
+  const handleShowcaseSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const payload = {
+      image_url: fd.get('image_url') as string,
+      title: fd.get('title') as string,
+      order: parseInt(fd.get('order') as string) || 0
+    };
+    if (editingShowcase) {
+      await supabase.from('showcase').update(payload).eq('id', editingShowcase.id);
+    } else {
+      await supabase.from('showcase').insert([payload]);
+    }
+    setIsShowcaseModalOpen(false);
+  };
+
+  const saveSiteContent = async (key: string, value: string) => {
+    setIsUpdatingSite(true);
+    await supabase.from('site_content').update({ value }).eq('key', key);
+    setEditingContent(prev => ({ ...prev, [key]: value }));
+    await refreshSite();
+    setIsUpdatingSite(false);
+  };
+
+  const handleUploadSiteImage = async (key: string, file: File) => {
+    setIsUpdatingSite(true);
+    const fileExt = file.name.split('.').pop();
+    const filePath = `site-assets/site-${key}-${Math.random()}.${fileExt}`;
+    await supabase.storage.from('images').upload(filePath, file);
+    const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(filePath);
+    await saveSiteContent(key, publicUrl);
+    setIsUpdatingSite(false);
   };
 
   const handleLogout = async () => {
@@ -450,636 +267,72 @@ export const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 pt-32 pb-24 px-6">
       <div className="max-w-[1200px] mx-auto">
+        {/* Header & Navigation */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-8">
           <div>
             <h1 className="text-4xl font-medium tracking-tighter mb-2">Dasbor</h1>
-            <p className="text-gray-500">Kelola konten portofolio Anda</p>
-            
-            <div className="flex gap-8 mt-8 border-b border-gray-100">
-              <button 
-                onClick={() => setActiveTab('projects')}
-                className={`pb-4 text-sm font-medium transition-all relative ${activeTab === 'projects' ? 'text-black' : 'text-gray-400 hover:text-gray-600'}`}
-              >
-                Proyek
-                {activeTab === 'projects' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
-              </button>
-              <button 
-                onClick={() => setActiveTab('packages')}
-                className={`pb-4 text-sm font-medium transition-all relative ${activeTab === 'packages' ? 'text-black' : 'text-gray-400 hover:text-gray-600'}`}
-              >
-                Paket Layanan
-                {activeTab === 'packages' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
-              </button>
-              <button 
-                onClick={() => setActiveTab('bookings')}
-                className={`pb-4 text-sm font-medium transition-all relative ${activeTab === 'bookings' ? 'text-black' : 'text-gray-400 hover:text-gray-600'}`}
-              >
-                Pesanan
-                {activeTab === 'bookings' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
-              </button>
+            <p className="text-gray-500 text-sm">Kelola konten portofolio Anda</p>
+            <div className="flex gap-8 mt-8 border-b border-gray-100 overflow-x-auto no-scrollbar">
+              {['projects', 'packages', 'bookings', 'testimonials', 'services', 'showcase', 'settings'].map((tab) => (
+                <button 
+                  key={tab}
+                  onClick={() => setActiveTab(tab as any)}
+                  className={`pb-4 text-[10px] uppercase tracking-widest font-bold transition-all relative whitespace-nowrap ${activeTab === tab ? 'text-black' : 'text-gray-300 hover:text-gray-500'}`}
+                >
+                  {tab === 'projects' ? 'Proyek' : tab === 'packages' ? 'Paket' : tab === 'bookings' ? 'Pesanan' : tab === 'testimonials' ? 'Testimoni' : tab === 'services' ? 'Layanan' : tab === 'showcase' ? 'Showcase' : 'Pengaturan'}
+                  {activeTab === tab && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-black" />}
+                </button>
+              ))}
             </div>
           </div>
           <div className="flex gap-4">
-            {activeTab === 'projects' ? (
+            {activeTab !== 'bookings' && activeTab !== 'settings' && (
               <button 
-                onClick={() => handleOpenModal()}
-                className="flex items-center gap-2 bg-[#1F2021] text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-800 transition-all"
+                onClick={() => {
+                  if (activeTab === 'projects') { setEditingProject(null); setIsProjectModalOpen(true); }
+                  else if (activeTab === 'packages') { setEditingPackage(null); setIsPackageModalOpen(true); }
+                  else if (activeTab === 'testimonials') { setEditingTestimonial(null); setIsTestiModalOpen(true); }
+                  else if (activeTab === 'services') { setEditingService(null); setIsServiceModalOpen(true); }
+                  else if (activeTab === 'showcase') { setEditingShowcase(null); setIsShowcaseModalOpen(true); }
+                }}
+                className="flex items-center gap-2 bg-[#1F2021] text-white px-6 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-all shadow-lg shadow-black/10"
               >
-                <Plus size={18} /> Tambah Proyek
+                <Plus size={14} /> Tambah {activeTab}
               </button>
-            ) : activeTab === 'packages' ? (
-              <button 
-                onClick={() => handleOpenPackageModal()}
-                className="flex items-center gap-2 bg-[#1F2021] text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-800 transition-all"
-              >
-                <Plus size={18} /> Tambah Paket
-              </button>
-            ) : null}
-            <button 
-              onClick={handleLogout}
-              className="flex items-center gap-2 border border-gray-200 px-6 py-3 rounded-full text-sm font-medium hover:bg-white transition-all"
-            >
-              <LogOut size={18} /> Keluar
+            )}
+            <button onClick={handleLogout} className="flex items-center gap-2 border border-gray-200 px-6 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-white transition-all">
+              Keluar
             </button>
           </div>
         </div>
 
-        {activeTab === 'projects' ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project) => (
-              <motion.div 
-                layout
-                key={project.id}
-                className="bg-white rounded-sm overflow-hidden shadow-sm border border-gray-100 group"
-              >
-                <div className="aspect-[4/3] overflow-hidden relative">
-                  <img 
-                    src={project.mainImg} 
-                    alt={project.title} 
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                  />
-                  <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
-                      onClick={() => handleOpenModal(project)}
-                      className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
-                    >
-                      <Edit2 size={16} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(project.id)}
-                      className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-red-50 transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-medium tracking-tight">{project.title}</h3>
-                    <span className="text-[10px] uppercase tracking-widest text-gray-400 bg-gray-50 px-2 py-1 rounded">
-                      {project.tag}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-500">Dipotret di {project.location}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        ) : activeTab === 'packages' ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {packages.map((pkg) => (
-              <motion.div 
-                layout
-                key={pkg.id}
-                className="bg-white rounded-sm overflow-hidden shadow-sm border border-gray-100 p-8 flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="flex justify-between items-start mb-6">
-                    <h3 className="text-2xl font-medium tracking-tight">{pkg.title}</h3>
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
-                        onClick={() => handleOpenPackageModal(pkg)}
-                        className="p-2 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button 
-                        onClick={() => handlePackageDelete(pkg.id)}
-                        className="p-2 bg-gray-50 rounded-full text-red-500 hover:bg-red-50 transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-6 leading-relaxed">{pkg.description}</p>
-                  <p className="text-xl font-medium mb-6">{pkg.price}</p>
-                  <ul className="space-y-3">
-                    {pkg.features.map((feat, i) => (
-                      <li key={i} className="text-xs text-gray-400 flex items-center gap-2">
-                        <span className="w-1 h-1 rounded-full bg-gray-200" />
-                        {feat}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="mt-8 pt-6 border-t border-gray-50 text-[10px] uppercase tracking-[0.2em] text-gray-300">
-                  Urutan: {pkg.order}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-sm border border-gray-100 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100 text-[10px] uppercase tracking-[0.2em] text-gray-400">
-                    <th className="px-6 py-4 font-bold">Klien</th>
-                    <th className="px-6 py-4 font-bold">Acara</th>
-                    <th className="px-6 py-4 font-bold">Tanggal</th>
-                    <th className="px-6 py-4 font-bold">Status</th>
-                    <th className="px-6 py-4 font-bold text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {bookings.map((booking) => (
-                    <tr key={booking.id} className="hover:bg-gray-50/50 transition-colors group">
-                      <td className="px-6 py-6">
-                        <p className="font-medium">{booking.client_name}</p>
-                        <p className="text-xs text-gray-400">{booking.whatsapp}</p>
-                      </td>
-                      <td className="px-6 py-6">
-                        <p className="text-sm">{booking.event_type}</p>
-                        <p className="text-xs text-gray-400">{booking.city}</p>
-                      </td>
-                      <td className="px-6 py-6 text-sm">
-                        {new Date(booking.event_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </td>
-                      <td className="px-6 py-6">
-                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded ${
-                          booking.status === 'confirmed' ? 'bg-green-50 text-green-600' :
-                          booking.status === 'completed' ? 'bg-blue-50 text-blue-600' :
-                          booking.status === 'cancelled' ? 'bg-red-50 text-red-600' :
-                          'bg-orange-50 text-orange-600'
-                        }`}>
-                          {booking.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-6 text-right">
-                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button 
-                            onClick={() => setSelectedBooking(booking)}
-                            className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
-                          >
-                            Detail
-                          </button>
-                          <button 
-                            onClick={async () => {
-                              if (window.confirm('Hapus pesanan ini?')) {
-                                const { error } = await supabase.from('bookings').delete().eq('id', booking.id);
-                                if (error) handleSupabaseError(error, OperationType.DELETE, `bookings/${booking.id}`);
-                              }
-                            }}
-                            className="text-red-400 hover:text-red-600"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {bookings.length === 0 && (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-20 text-center text-gray-400 italic">Belum ada pesanan masuk.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        {/* Tab Content */}
+        <div className="min-h-[400px]">
+          {activeTab === 'projects' && <ProjectsTab projects={projects} onOpenModal={(p) => { setEditingProject(p || null); setIsProjectModalOpen(true); }} onDelete={handleProjectDelete} />}
+          {activeTab === 'packages' && <PackagesTab packages={packages} onOpenModal={(pkg) => { setEditingPackage(pkg || null); setIsPackageModalOpen(true); }} onDelete={(id) => supabase.from('packages').delete().eq('id', id)} />}
+          {activeTab === 'bookings' && <BookingsTab bookings={bookings} onSelect={(b) => { setSelectedBooking(b); setIsBookingDetailOpen(true); }} />}
+          {activeTab === 'testimonials' && <TestimonialsTab testimonials={testimonials} onEdit={(t) => { setEditingTestimonial(t); setIsTestiModalOpen(true); }} onDelete={(id) => supabase.from('testimonials').delete().eq('id', id)} />}
+          {activeTab === 'services' && <ServicesTab services={siteServices} onEdit={(s) => { setEditingService(s); setIsServiceModalOpen(true); }} onDelete={(id) => supabase.from('site_services').delete().eq('id', id)} />}
+          {activeTab === 'showcase' && <ShowcaseTab items={showcaseItems} onEdit={(i) => { setEditingShowcase(i); setIsShowcaseModalOpen(true); }} onDelete={(id) => supabase.from('showcase').delete().eq('id', id)} />}
+          {activeTab === 'settings' && <SettingsTab siteContent={siteItems || []} editingContent={editingContent} onUpdate={(k, v) => setEditingContent(p => ({...p, [k]: v}))} onUploadImage={handleUploadSiteImage} onSave={saveSiteContent} isUpdating={isUpdatingSite} />}
+        </div>
 
-        <AnimatePresence>
-          {isModalOpen && (
-            <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setIsModalOpen(false)}
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-              />
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative bg-white w-full max-w-2xl rounded-sm shadow-2xl overflow-hidden"
-              >
-                <div className="p-8 border-b border-gray-100 flex justify-between items-center">
-                  <h2 className="text-2xl font-medium tracking-tighter">
-                    {editingProject ? 'Edit Proyek' : 'Proyek Baru'}
-                  </h2>
-                  <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-black">
-                    <X size={24} />
-                  </button>
-                </div>
-                
-                <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-gray-400">Judul</label>
-                      <input 
-                        required
-                        type="text" 
-                        value={formData.title}
-                        onChange={(e) => setFormData({...formData, title: e.target.value})}
-                        className="w-full border-b border-gray-200 py-2 focus:border-black outline-none transition-colors"
-                        placeholder="Judul proyek"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-gray-400">Lokasi</label>
-                      <input 
-                        required
-                        type="text" 
-                        value={formData.location}
-                        onChange={(e) => setFormData({...formData, location: e.target.value})}
-                        className="w-full border-b border-gray-200 py-2 focus:border-black outline-none transition-colors"
-                        placeholder="Kota, Negara"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-gray-400">Tag</label>
-                      <input 
-                        required
-                        type="text" 
-                        value={formData.tag}
-                        onChange={(e) => setFormData({...formData, tag: e.target.value})}
-                        className="w-full border-b border-gray-200 py-2 focus:border-black outline-none transition-colors"
-                        placeholder="misal: Editorial, Potret"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-gray-400">Urutan</label>
-                      <input 
-                        required
-                        type="number" 
-                        value={formData.order}
-                        onChange={(e) => setFormData({...formData, order: parseInt(e.target.value)})}
-                        className="w-full border-b border-gray-200 py-2 focus:border-black outline-none transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-gray-400">Deskripsi</label>
-                    <textarea 
-                      rows={3}
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      className="w-full border border-gray-200 p-4 rounded-sm focus:border-black outline-none transition-colors resize-none"
-                      placeholder="Deskripsi proyek..."
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-gray-400">URL Video (YouTube - Opsional)</label>
-                    <input 
-                      type="text" 
-                      value={formData.videoUrl}
-                      onChange={(e) => setFormData({...formData, videoUrl: e.target.value})}
-                      className="w-full border-b border-gray-200 py-2 focus:border-black outline-none transition-colors"
-                      placeholder="https://www.youtube.com/watch?v=..."
-                    />
-                    <p className="text-[10px] text-gray-400 italic">Biarkan kosong jika ini adalah proyek foto saja.</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-gray-400">URL Gambar Utama</label>
-                    <div className="flex gap-4">
-                      <input 
-                        required
-                        type="text" 
-                        value={formData.mainImg}
-                        onChange={(e) => setFormData({...formData, mainImg: e.target.value})}
-                        className="flex-1 border-b border-gray-200 py-2 focus:border-black outline-none transition-colors"
-                        placeholder="https://images.unsplash.com/..."
-                      />
-                      {formData.mainImg && (
-                        <div className="w-12 h-12 rounded-sm overflow-hidden bg-gray-100">
-                          <img src={formData.mainImg} alt="Preview" className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-gray-400">URL Gambar Detail (pisahkan dengan koma)</label>
-                    <textarea 
-                      required
-                      rows={4}
-                      value={formData.detailImages}
-                      onChange={(e) => setFormData({...formData, detailImages: e.target.value})}
-                      className="w-full border border-gray-200 p-4 rounded-sm focus:border-black outline-none transition-colors resize-none"
-                      placeholder="url1, url2, url3..."
-                    />
-                  </div>
-
-                  <button 
-                    type="submit"
-                    className="w-full flex items-center justify-center gap-2 bg-[#1F2021] text-white py-4 rounded-full font-medium hover:bg-gray-800 transition-all"
-                  >
-                    <Save size={18} /> Simpan Proyek
-                  </button>
-                </form>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {isPackageModalOpen && (
-            <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setIsPackageModalOpen(false)}
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-              />
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative bg-white w-full max-w-2xl rounded-sm shadow-2xl overflow-hidden"
-              >
-                <div className="p-8 border-b border-gray-100 flex justify-between items-center">
-                  <h2 className="text-2xl font-medium tracking-tighter">
-                    {editingPackage ? 'Edit Paket' : 'Paket Baru'}
-                  </h2>
-                  <button onClick={() => setIsPackageModalOpen(false)} className="text-gray-400 hover:text-black">
-                    <X size={24} />
-                  </button>
-                </div>
-                
-                <form onSubmit={handlePackageSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-gray-400">Nama Paket</label>
-                    <input 
-                      required
-                      type="text" 
-                      value={packageData.title}
-                      onChange={(e) => setPackageData({...packageData, title: e.target.value})}
-                      className="w-full border-b border-gray-200 py-2 focus:border-black outline-none transition-colors"
-                      placeholder="misal: Wedding Bronze"
-                    />
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-gray-400">Harga</label>
-                      <input 
-                        type="text" 
-                        value={packageData.price}
-                        onChange={(e) => setPackageData({...packageData, price: e.target.value})}
-                        className="w-full border-b border-gray-200 py-2 focus:border-black outline-none transition-colors"
-                        placeholder="misal: Rp 5.000.000 atau Mulai dari..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-gray-400">Urutan</label>
-                      <input 
-                        required
-                        type="number" 
-                        value={packageData.order}
-                        onChange={(e) => setPackageData({...packageData, order: parseInt(e.target.value)})}
-                        className="w-full border-b border-gray-200 py-2 focus:border-black outline-none transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-gray-400">Deskripsi Singkat</label>
-                    <textarea 
-                      rows={2}
-                      value={packageData.description}
-                      onChange={(e) => setPackageData({...packageData, description: e.target.value})}
-                      className="w-full border border-gray-200 p-4 rounded-sm focus:border-black outline-none transition-colors resize-none"
-                      placeholder="Penjelasan singkat paket..."
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-gray-400">Fitur / Apa yang didapat (pisahkan dengan koma)</label>
-                    <textarea 
-                      required
-                      rows={4}
-                      value={packageData.features}
-                      onChange={(e) => setPackageData({...packageData, features: e.target.value})}
-                      className="w-full border border-gray-200 p-4 rounded-sm focus:border-black outline-none transition-colors resize-none"
-                      placeholder="50 Foto Edit, 2 Jam Sesi, Semua File Mentah, dsb..."
-                    />
-                  </div>
-
-                  <button 
-                    type="submit"
-                    className="w-full flex items-center justify-center gap-2 bg-[#1F2021] text-white py-4 rounded-full font-medium hover:bg-gray-800 transition-all"
-                  >
-                    <Save size={18} /> Simpan Paket
-                  </button>
-                </form>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {selectedBooking && (
-            <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-              <motion.div 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                onClick={() => setSelectedBooking(null)}
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-              />
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                className="relative bg-white w-full max-w-2xl rounded-sm shadow-2xl overflow-hidden"
-              >
-                <div className="p-8 border-b border-gray-100 flex justify-between items-center">
-                  <h2 className="text-2xl font-medium tracking-tighter">Detail Pesanan</h2>
-                  <button onClick={() => setSelectedBooking(null)} className="text-gray-400 hover:text-black"><X size={24} /></button>
-                </div>
-                <div className="p-8 max-h-[70vh] overflow-y-auto space-y-8">
-                  <div className="grid grid-cols-2 gap-8">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">Klien</p>
-                      <p className="font-medium">{selectedBooking.client_name}</p>
-                      <p className="text-sm text-gray-500">{selectedBooking.whatsapp}</p>
-                      <p className="text-sm text-gray-500">{selectedBooking.email || '-'}</p>
-                      <p className="text-sm text-gray-500">{selectedBooking.instagram || '-'}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">Acara</p>
-                      <p className="font-medium">{selectedBooking.event_type}</p>
-                      <p className="text-sm text-gray-500">{selectedBooking.city}</p>
-                      <p className="text-sm text-gray-500">{selectedBooking.address}</p>
-                      <p className="text-sm text-gray-500">{new Date(selectedBooking.event_date).toLocaleDateString('id-ID', { dateStyle: 'long' })}</p>
-                    </div>
-                  </div>
-
-                  <div className="p-6 bg-gray-50 rounded-sm">
-                    <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-4">Layanan & Pembayaran</p>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between">
-                        <span>Total Biaya</span>
-                        <span className="font-medium">Rp {selectedBooking.total_price.toLocaleString('id-ID')}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Jumlah DP (30%)</span>
-                        <span className="font-medium text-green-600">- Rp {selectedBooking.dp_amount.toLocaleString('id-ID')}</span>
-                      </div>
-                      {selectedBooking.final_payment_amount > 0 && (
-                        <div className="flex justify-between">
-                          <span>Pelunasan Dibayar</span>
-                          <span className="font-medium text-green-600">- Rp {selectedBooking.final_payment_amount.toLocaleString('id-ID')}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between border-t border-gray-200 pt-3">
-                        <span className="font-bold">Sisa Tagihan</span>
-                        <span className="font-bold text-red-600">
-                          Rp {(selectedBooking.total_price - selectedBooking.dp_amount - selectedBooking.final_payment_amount).toLocaleString('id-ID')}
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-xs text-gray-400 pt-2 italic">
-                        <span>Ref Rekening DP</span>
-                        <span className="font-mono">{selectedBooking.bank_ref}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Input Pelunasan Section */}
-                  <div className="p-6 border border-gray-100 rounded-sm space-y-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-1 h-4 bg-[#1F2021] rounded-full" />
-                      <p className="text-[10px] uppercase tracking-widest font-bold">Input Pelunasan (Opsional)</p>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-[10px] uppercase tracking-widest text-gray-400 font-bold ml-1">Nominal Pelunasan</label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm">Rp</span>
-                          <input 
-                            type="number"
-                            value={finalPaymentAmount || ''}
-                            onChange={(e) => setFinalPaymentAmount(parseInt(e.target.value) || 0)}
-                            className="w-full bg-white border border-gray-200 px-10 py-3 rounded-sm text-sm focus:border-black outline-none transition-all"
-                            placeholder="0"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] uppercase tracking-widest text-gray-400 font-bold ml-1">Bukti Pelunasan</label>
-                        <div className="relative border border-gray-200 rounded-sm p-3 flex items-center justify-between group hover:border-gray-300 transition-all">
-                          <input 
-                            type="file"
-                            onChange={(e) => setFinalPaymentProof(e.target.files?.[0] || null)}
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                          />
-                          <span className="text-xs text-gray-500 truncate pr-8">
-                            {finalPaymentProof ? finalPaymentProof.name : (selectedBooking.final_payment_proof_url ? 'Pilih file baru untuk ganti' : 'Pilih file...')}
-                          </span>
-                          <Upload size={14} className="text-gray-300 group-hover:text-black transition-colors" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {selectedBooking.final_payment_proof_url && !finalPaymentProof && (
-                      <div className="pt-2">
-                        <a 
-                          href={selectedBooking.final_payment_proof_url} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-black flex items-center gap-2"
-                        >
-                          <ExternalLink size={10} /> Lihat Bukti Pelunasan Saat Ini
-                        </a>
-                      </div>
-                    )}
-
-                    <button 
-                      onClick={handleSavePelunasan}
-                      disabled={isUpdatingPayment}
-                      className="w-full py-4 bg-gray-50 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#1F2021] hover:text-white transition-all disabled:opacity-50"
-                    >
-                      {isUpdatingPayment ? 'Menyimpan...' : 'Simpan Data Pelunasan'}
-                    </button>
-                  </div>
-
-                  {selectedBooking.proof_url && (
-                    <div>
-                      <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-4">Bukti Transfer</p>
-                      <a href={selectedBooking.proof_url} target="_blank" rel="noreferrer" className="block w-full aspect-video rounded-sm overflow-hidden bg-gray-100 hover:opacity-90 transition-opacity">
-                        <img src={selectedBooking.proof_url} alt="Proof" className="w-full h-full object-contain" />
-                      </a>
-                    </div>
-                  )}
-
-                  <div className="space-y-4">
-                    <p className="text-[10px] uppercase tracking-widest text-gray-400">Update Status</p>
-                    <div className="flex flex-wrap gap-2">
-                      {['pending', 'confirmed', 'completed', 'cancelled'].map((status) => (
-                        <button
-                          key={status}
-                          onClick={async () => {
-                            const { error } = await supabase.from('bookings').update({ status }).eq('id', selectedBooking.id);
-                            if (!error) setSelectedBooking({ ...selectedBooking, status: status as any });
-                          }}
-                          className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
-                            selectedBooking.status === status ? 'bg-black text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                          }`}
-                        >
-                          {status}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="flex flex-col md:flex-row gap-4 pt-4">
-                      <button 
-                        onClick={handleDownloadInvoice}
-                        disabled={isGeneratingPDF}
-                        className="flex-1 bg-[#1F2021] text-white py-4 rounded-sm text-sm font-medium hover:bg-black transition-all flex items-center justify-center gap-2"
-                      >
-                        {isGeneratingPDF ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                            Memproses...
-                          </>
-                        ) : (
-                          <>
-                            <FileText size={18} /> Unduh Invoice (PDF)
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
-
-        {selectedBooking && (
-          <div className="fixed -left-[9999px]">
-            <InvoiceTemplate 
-              ref={invoiceRef}
-              booking={selectedBooking}
-              pkg={packages.find(p => p.id === selectedBooking.package_id)}
-              invoiceNumber={`${selectedBooking.id.substring(0, 8).toUpperCase()}`}
-            />
-          </div>
-        )}
+        {/* Modals */}
+        <ProjectModal isOpen={isProjectModalOpen} onClose={() => setIsProjectModalOpen(false)} project={editingProject} onSubmit={handleProjectSubmit} initialOrder={projects.length} />
+        <PackageModal isOpen={isPackageModalOpen} onClose={() => setIsPackageModalOpen(false)} pkg={editingPackage} onSubmit={handlePackageSubmit} initialOrder={packages.length} />
+        <BookingDetailModal 
+          isOpen={isBookingDetailOpen} 
+          onClose={() => setIsBookingDetailOpen(false)} 
+          booking={selectedBooking} 
+          packages={packages} 
+          onUpdate={(b) => {
+            setBookings(prev => prev.map(old => old.id === b.id ? b : old));
+            setSelectedBooking(b);
+          }}
+        />
+        <TestimonialModal isOpen={isTestiModalOpen} onClose={() => setIsTestiModalOpen(false)} testimonial={editingTestimonial} onSubmit={handleTestiSubmit} />
+        <ServiceModal isOpen={isServiceModalOpen} onClose={() => setIsServiceModalOpen(false)} service={editingService} onSubmit={handleServiceSubmit} />
+        <ShowcaseModal isOpen={isShowcaseModalOpen} onClose={() => setIsShowcaseModalOpen(false)} item={editingShowcase} onSubmit={handleShowcaseSubmit} />
       </div>
     </div>
   );

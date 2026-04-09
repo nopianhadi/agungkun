@@ -1,8 +1,10 @@
 import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useSiteContent } from '../../hooks/useSiteContent';
 
 export const Hero = () => {
   const { scrollY } = useScroll();
+  const { getContent } = useSiteContent();
   const y = useTransform(scrollY, [0, 1000], [0, 400]);
   const opacity = useTransform(scrollY, [0, 800], [1, 0]);
 
@@ -10,7 +12,7 @@ export const Hero = () => {
     <section id="hero" className="relative h-screen w-full overflow-hidden bg-white">
       <motion.img
         style={{ y }}
-        src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2000&auto=format&fit=crop"
+        src={getContent('hero_image', "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2000&auto=format&fit=crop")}
         alt="Hero"
         className="absolute inset-0 w-full h-[120%] object-cover grayscale opacity-90 origin-top"
       />
@@ -25,8 +27,12 @@ export const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
         >
-          <h1 className="text-7xl md:text-[12vw] leading-[0.8] font-medium tracking-tighter mb-4">moment</h1>
-          <p className="text-lg md:text-2xl font-medium tracking-tight">Oleh Agung Kun</p>
+          <h1 className="text-7xl md:text-[12vw] leading-[0.8] font-medium tracking-tighter mb-4">
+            {getContent('hero_title', 'moment')}
+          </h1>
+          <p className="text-lg md:text-2xl font-medium tracking-tight">
+            {getContent('hero_subtitle', 'Oleh Agung Kun')}
+          </p>
         </motion.div>
 
         <motion.div

@@ -1,0 +1,338 @@
+[
+  {
+    "key": "hero_image",
+    "value": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2000&auto=format&fit=crop",
+    "type": "image",
+    "label": "Gambar Background",
+    "section": "Hero"
+  },
+  {
+    "key": "about_title",
+    "value": "Portofolio ini adalah buku harian visual dari tempat, orang, dan momen yang saya kumpulkan melalui lensa.",
+    "type": "textarea",
+    "label": "Judul Narasi",
+    "section": "About"
+  },
+  {
+    "key": "about_description",
+    "value": "“Saya memotret foto-foto yang autentik dan ekspresif, yang menangkap esensi dari setiap momen.”",
+    "type": "textarea",
+    "label": "Kutipan Filosofis",
+    "section": "About"
+  },
+  {
+    "key": "about_image",
+    "value": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop",
+    "type": "image",
+    "label": "Foto Studio/Profil",
+    "section": "About"
+  },
+  {
+    "key": "about_location",
+    "value": "Kyoto",
+    "type": "text",
+    "label": "Label Lokasi Foto",
+    "section": "About"
+  },
+  {
+    "key": "services_header",
+    "value": "Layanan / (02)",
+    "type": "text",
+    "label": "Header Section",
+    "section": "Home - Services"
+  },
+  {
+    "key": "services_badge",
+    "value": "Foto diterbitkan di VOGUE",
+    "type": "text",
+    "label": "Badge Prestasi",
+    "section": "Home - Services"
+  },
+  {
+    "key": "services_title",
+    "value": "Saya menangkap momen-momen bermakna melalui berbagai layanan fotografi yang disesuaikan.",
+    "type": "textarea",
+    "label": "Judul Besar",
+    "section": "Home - Services"
+  },
+  {
+    "key": "services_desc",
+    "value": "Citra yang elegan, emosional, dan abadi yang menceritakan kisah lengkap hari Anda.",
+    "type": "textarea",
+    "label": "Deskripsi Pendek",
+    "section": "Home - Services"
+  },
+  {
+    "key": "testi_header",
+    "value": "Testimoni / (04)",
+    "type": "text",
+    "label": "Header Section",
+    "section": "Home - Testimonials"
+  },
+  {
+    "key": "testi_quote",
+    "value": "Saya biasanya benci difoto, tapi kali ini terasa sangat berbeda. Sangat santai, tidak ada yang dipaksakan. Hasil fotonya benar-benar terlihat seperti saya, bukan versi saya yang berusaha terlalu keras.",
+    "type": "textarea",
+    "label": "Isi Testimoni",
+    "section": "Home - Testimonials"
+  },
+  {
+    "key": "testi_author",
+    "value": "Anna Pechuro",
+    "type": "text",
+    "label": "Nama Pengirim",
+    "section": "Home - Testimonials"
+  },
+  {
+    "key": "testi_meta",
+    "value": "Sesi foto di Prague",
+    "type": "text",
+    "label": "Lokasi/Konteks",
+    "section": "Home - Testimonials"
+  },
+  {
+    "key": "testi_image",
+    "value": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+    "type": "image",
+    "label": "Foto Pengirim",
+    "section": "Home - Testimonials"
+  },
+  {
+    "key": "video_section_title",
+    "value": "Video Portfolio",
+    "type": "text",
+    "label": "Judul Section",
+    "section": "Home - Videos"
+  },
+  {
+    "key": "video_section_subtitle",
+    "value": "Pekerjaan Sinematik",
+    "type": "text",
+    "label": "Subjudul",
+    "section": "Home - Videos"
+  },
+  {
+    "key": "video_section_quote",
+    "value": "Kisah dalam Gerakan",
+    "type": "text",
+    "label": "Kutipan",
+    "section": "Home - Videos"
+  },
+  {
+    "key": "showcase_header",
+    "value": "Showcase / (05)",
+    "type": "text",
+    "label": "Header Section",
+    "section": "Home - Showcase"
+  },
+  {
+    "key": "showcase_subtitle",
+    "value": "Album Pexels paling banyak dilihat",
+    "type": "text",
+    "label": "Subjudul",
+    "section": "Home - Showcase"
+  },
+  {
+    "key": "showcase_btn_text",
+    "value": "Lihat album",
+    "type": "text",
+    "label": "Label Tombol",
+    "section": "Home - Showcase"
+  },
+  {
+    "key": "pkgs_hero_badge",
+    "value": "Investasi Masa Depan",
+    "type": "text",
+    "label": "Label Badge Atas",
+    "section": "Packages - Hero"
+  },
+  {
+    "key": "pkgs_hero_title",
+    "value": "Momen Abadi.",
+    "type": "text",
+    "label": "Judul Utama",
+    "section": "Packages - Hero"
+  },
+  {
+    "key": "pkgs_hero_desc",
+    "value": "Sebuah investasi untuk kenangan yang tidak akan pernah pudar oleh waktu.",
+    "type": "textarea",
+    "label": "Deskripsi Hero",
+    "section": "Packages - Hero"
+  },
+  {
+    "key": "pkgs_hero_image",
+    "value": "https://images.unsplash.com/photo-1510076857177-7470076d4098?q=80&w=2000&auto=format&fit=crop",
+    "type": "image",
+    "label": "Gambar Hero",
+    "section": "Packages - Hero"
+  },
+  {
+    "key": "pkgs_phil_header",
+    "value": "Filosofi Kami / (01)",
+    "type": "text",
+    "label": "Header Section",
+    "section": "Packages - Philosophy"
+  },
+  {
+    "key": "pkgs_phil_title",
+    "value": "Lebih dari sekadar sebuah foto.",
+    "type": "text",
+    "label": "Judul Filosofi",
+    "section": "Packages - Philosophy"
+  },
+  {
+    "key": "pkgs_phil_desc",
+    "value": "Kami percaya bahwa fotografi adalah tentang menangkap perasaan, bukan hanya penampilan.",
+    "type": "textarea",
+    "label": "Deskripsi Filosofi",
+    "section": "Packages - Philosophy"
+  },
+  {
+    "key": "pkgs_phil_image",
+    "value": "https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1200&auto=format&fit=crop",
+    "type": "image",
+    "label": "Gambar Filosofi",
+    "section": "Packages - Philosophy"
+  },
+  {
+    "key": "pkgs_phil_vision_title",
+    "value": "Visi",
+    "type": "text",
+    "label": "Label Visi",
+    "section": "Packages - Philosophy"
+  },
+  {
+    "key": "pkgs_phil_vision_desc",
+    "value": "Kualitas abadi yang melampaui tren masa kini.",
+    "type": "text",
+    "label": "Isi Visi",
+    "section": "Packages - Philosophy"
+  },
+  {
+    "key": "pkgs_phil_mission_title",
+    "value": "Misi",
+    "type": "text",
+    "label": "Label Misi",
+    "section": "Packages - Philosophy"
+  },
+  {
+    "key": "pkgs_phil_mission_desc",
+    "value": "Menciptakan warisan visual untuk generasi mendatang.",
+    "type": "text",
+    "label": "Isi Misi",
+    "section": "Packages - Philosophy"
+  },
+  {
+    "key": "pkgs_process_header",
+    "value": "Alur Kerja / (03)",
+    "type": "text",
+    "label": "Header Section",
+    "section": "Packages - Process"
+  },
+  {
+    "key": "pkgs_proc1_title",
+    "value": "01. Perencanaan",
+    "type": "text",
+    "label": "Langkah 1",
+    "section": "Packages - Process"
+  },
+  {
+    "key": "pkgs_proc1_desc",
+    "value": "Kita akan mendiskusikan visi dan detail teknis.",
+    "type": "textarea",
+    "label": "Deskripsi Langkah 1",
+    "section": "Packages - Process"
+  },
+  {
+    "key": "pkgs_proc2_title",
+    "value": "02. Pemotretan",
+    "type": "text",
+    "label": "Langkah 2",
+    "section": "Packages - Process"
+  },
+  {
+    "key": "pkgs_proc2_desc",
+    "value": "Nikmati momen Anda. Kami akan menangkap tawa dan emosi.",
+    "type": "textarea",
+    "label": "Deskripsi Langkah 2",
+    "section": "Packages - Process"
+  },
+  {
+    "key": "pkgs_proc3_title",
+    "value": "03. Hasil Akhir",
+    "type": "text",
+    "label": "Langkah 3",
+    "section": "Packages - Process"
+  },
+  {
+    "key": "pkgs_proc3_desc",
+    "value": "Foto Anda akan diproses dengan kurasi warna abadi.",
+    "type": "textarea",
+    "label": "Deskripsi Langkah 3",
+    "section": "Packages - Process"
+  },
+  {
+    "key": "contact_whatsapp",
+    "value": "6287802023377",
+    "type": "text",
+    "label": "Nomor WhatsApp (Tanpa +)",
+    "section": "Contact"
+  },
+  {
+    "key": "contact_email",
+    "value": "aguangkun@gmail.com",
+    "type": "text",
+    "label": "Email Utama",
+    "section": "Contact"
+  },
+  {
+    "key": "contact_instagram",
+    "value": "agungkunn",
+    "type": "text",
+    "label": "Username Instagram",
+    "section": "Contact"
+  },
+  {
+    "key": "contact_address",
+    "value": "Berbasis di Indonesia. Tersedia untuk penugasan di seluruh dunia.",
+    "type": "text",
+    "label": "Lokasi Studio/Kantor",
+    "section": "Contact"
+  },
+  {
+    "key": "brand_name",
+    "value": "Agung Kun",
+    "type": "text",
+    "label": "Nama Brand & Copyright",
+    "section": "Global"
+  },
+  {
+    "key": "footer_cta_title",
+    "value": "Menciptakan Sesuatu yang Abadi.",
+    "type": "text",
+    "label": "Judul CTA Footer",
+    "section": "Global"
+  },
+  {
+    "key": "footer_cta_subtitle",
+    "value": "Mari kita abadikan kisah Anda bersama.",
+    "type": "text",
+    "label": "Subjudul CTA Footer",
+    "section": "Global"
+  },
+  {
+    "key": "hero_title",
+    "value": "agungkun",
+    "type": "text",
+    "label": "Judul Utama",
+    "section": "Hero"
+  },
+  {
+    "key": "hero_subtitle",
+    "value": "Oleh Agung Kun",
+    "type": "text",
+    "label": "Subjudul",
+    "section": "Hero"
+  }
+]

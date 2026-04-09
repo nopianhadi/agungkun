@@ -64,9 +64,7 @@ export const Dashboard = () => {
 
 
   useEffect(() => {
-    seedDatabase().then(() => {
-      fetchAllData();
-    });
+    fetchAllData();
   }, []);
 
   const fetchAllData = () => {

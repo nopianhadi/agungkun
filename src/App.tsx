@@ -28,7 +28,6 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const { user, loading: authLoading, isAdmin } = useAuth();
-  const isAdminRoute = location.pathname === '/admin';
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -58,25 +57,21 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  if (isAdminRoute) {
-    if (authLoading) return <div className="min-h-screen flex items-center justify-center"><div className="w-12 h-12 border-4 border-gray-100 border-t-[#1F2021] rounded-full animate-spin" /></div>;
-    if (!user) return <Login />;
-    if (!isAdmin) return <div className="min-h-screen flex items-center justify-center text-center px-6"><div><h1 className="text-2xl font-medium mb-4">Akses Ditolak</h1><p className="text-gray-500">Anda tidak memiliki izin untuk mengakses dasbor admin.</p></div></div>;
-    return (
-      <ErrorBoundary>
-        <Dashboard />
-      </ErrorBoundary>
-    );
-  }
+  if (authLoading) return <div className="min-h-screen flex items-center justify-center"><div className="w-12 h-12 border-4 border-gray-100 border-t-[#1F2021] rounded-full animate-spin" /></div>;
 
   return (
     <div className="min-h-screen bg-white text-[#1F2021] selection:bg-[#1F2021] selection:text-white">
-      <Navbar onMenuOpen={() => setIsMenuOpen(true)} />
-      <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      {!location.pathname.startsWith('/manage') && (
+        <>
+          <Navbar onMenuOpen={() => setIsMenuOpen(true)} />
+          <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+        </>
+      )}
 
       <AnimatePresence mode="wait">
         <motion.div key={location.pathname}>
           <Routes location={location}>
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/tentang" element={<AboutPage />} />
             <Route path="/layanan" element={<ServicesPage />} />
@@ -86,13 +81,26 @@ export default function App() {
             <Route path="/jurnal" element={<JournalPage />} />
             <Route path="/kontak" element={<ContactPage />} />
             <Route path="/project/:projectId" element={<ProjectDetail />} />
-            <Route path="/admin" element={<div />} />
+
+            {/* Admin Routes */}
+            <Route 
+              path="/manage" 
+              element={
+                !user ? <Login /> : 
+                !isAdmin ? <div className="min-h-screen flex items-center justify-center text-center px-6"><div><h1 className="text-2xl font-medium mb-4">Akses Ditolak</h1><p className="text-gray-500">Anda tidak memiliki izin untuk mengakses dasbor admin.</p></div></div> :
+                <ErrorBoundary><Dashboard /></ErrorBoundary>
+              } 
+            />
           </Routes>
         </motion.div>
       </AnimatePresence>
 
-      <Footer />
-      <WhatsAppButton />
+      {!location.pathname.startsWith('/manage') && (
+        <>
+          <Footer />
+          <WhatsAppButton />
+        </>
+      )}
     </div>
   );
 }
